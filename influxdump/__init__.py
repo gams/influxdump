@@ -3,7 +3,7 @@ import argparse
 import getpass
 import json
 
-from data import read_data, dump_data
+from data import read_data, dump_data, write_data, load_data
 from db import get_client
 
 
@@ -56,7 +56,8 @@ def dump(args, client):
 
 
 def load(args, client):
-    pass
+    data = load_data(args["input"])
+    return write_data(client, data)
 
 
 if __name__ == "__main__":

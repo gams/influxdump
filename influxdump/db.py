@@ -84,3 +84,21 @@ def get_queries(measurements, ctx=None):
         queries.append(q)
 
     return queries
+
+
+def data_to_points(measurement, records):
+    points = []
+    for record in records:
+        ts = record.pop("time")
+        fields = {}
+        for name, value in record.items():
+            if value is not None:
+                fields[name] = float(value)
+        if fields:
+            points.append({
+                "measurement": measurement,
+                "time": ts,
+                "fields": fields,
+            })
+
+    return points

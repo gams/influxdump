@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 
-from db import get_queries, get_measurements
+from db import get_queries, get_measurements, data_to_points
 
 
 def read_data(c, pattern=None):
@@ -34,3 +34,15 @@ def query_data(c, queries):
 
 def dump_data(data):
     print(json.dumps(data))
+
+
+def write_data(c, data):
+    for chunk in data:
+        points = data_to_points(chunk["meta"]["measurement"],
+                                chunk["records"])
+        c.write_points(points, batch_size=10000)
+
+
+def load_data(datafile):
+    with open(datafile, 'r') as fh:
+        return json.load(fh)
