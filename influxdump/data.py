@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 
-from db import get_queries, get_measurements, data_to_points
+from db import get_queries, data_to_points
 
 
 def read_data(c, pattern=None):
@@ -12,7 +12,7 @@ def read_data(c, pattern=None):
     :param measurements: a list of measurements to query
     :type measurements: list
     """
-    measurements = get_measurements(c, pattern)
+    measurements = c.get_measurements(pattern)
     queries = get_queries(measurements)
     return query_data(c, queries)
 
@@ -22,7 +22,7 @@ def query_data(c, queries):
     for q in queries:
         res = c.query(q.get_query())
         records = []
-        for point in res.get_points():
+        for point in c.get_points(res):
             records.append(point)
         data.append({
             "meta": q.get_meta(),
