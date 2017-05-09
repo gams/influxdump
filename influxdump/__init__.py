@@ -15,8 +15,8 @@ __version__ = "0.1-alpha"
 def get_args():
     parser = argparse.ArgumentParser(description='influxDB data backup tool')
     parser.add_argument('-u', '--user', help='username', default='', type=str)
-    parser.add_argument('-w', '--password', help='password', nargs=1,
-            default='', type=str)
+    parser.add_argument('-w', '--password', help='password', default='',
+            type=str)
     parser.add_argument('-W', '--pwdprompt', help='password prompt',
             action="store_true")
     parser.add_argument('-d', '--database', help='database', required=True,
@@ -26,6 +26,8 @@ def get_args():
     parser.add_argument('-p', '--port', help='server port', default=8086,
             type=int)
     parser.add_argument('-m', '--measurements', help='measurement pattern')
+    parser.add_argument('-L', '--legacy', action="store_true",
+            help='influxdb legacy client (<=0.8)')
     parser.add_argument('-i', '--input', default=None,
             help="data/metadata input file, will force action to 'load'")
     parser.add_argument('action', metavar="action", nargs="?", default='dump',
@@ -68,6 +70,7 @@ if __name__ == "__main__":
             user=args["user"],
             pwd=args["pwd"],
             db=args["db"],
+            legacy=args["legacy"],
     )
 
     if args["action"] == "load" or args["input"] is not None:

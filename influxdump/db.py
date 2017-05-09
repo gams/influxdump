@@ -7,7 +7,7 @@ import influxdb
 def get_client(host, port, user, pwd, db, legacy=False):
     """Return a configured influxdb client"""
     if legacy:
-        return influxdb.influxdb08,InfluxDBClient(
+        return influxdb.influxdb08.InfluxDBClient(
                 host=host,
                 port=port,
                 username=user,
