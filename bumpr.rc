@@ -1,0 +1,12 @@
+[bumpr]
+file = influxdump/__init__.py
+vcs = git
+clean =
+    python setup.py clean
+    rm -rf *egg-info build dist
+files =
+    setup.py
+
+[bump]
+unsuffix = False
+message = bump version to {version}

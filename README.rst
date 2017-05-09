@@ -16,6 +16,23 @@ Dump data::
 
     $ influxdump -u root -p -d database > data_dump.json
 
+Packaging
+=========
+
+Create packages:
+
+.. code-block:: sh
+
+    $ python setup.py sdist bdist_wheel
+
+Push package:
+
+.. code-block:: sh
+
+    $ twine upload dist/*
+    $ twine upload -r pypi dist/*
+
+
 License
 =======
 

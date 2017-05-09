@@ -4,11 +4,17 @@
 #
 #    pip-compile --output-file requirements-dev.txt requirements-dev.in
 #
+args==0.1.0               # via clint
+bumpr==0.3.6
 click==6.6                # via pip-tools
+clint==0.5.1              # via twine
 first==2.0.1              # via pip-tools
 influxdb==4.0.0
-pip-tools==1.8.0
+pip-tools==1.9.0
+pkginfo==1.4.1            # via twine
 python-dateutil==2.6.0    # via influxdb
 pytz==2016.10             # via influxdb
-requests==2.12.3          # via influxdb
+requests-toolbelt==0.7.1  # via twine
+requests==2.12.3          # via influxdb, requests-toolbelt, twine
 six==1.10.0               # via influxdb, pip-tools, python-dateutil
+twine==1.8.1
