@@ -1,27 +1,21 @@
 # -*- coding: utf-8 -*-
 import re
 
-import influxdb
-
 
 def get_client(host, port, user, pwd, db, legacy=False):
     """Return a configured influxdb client"""
     if legacy:
-        return influxdb.influxdb08.InfluxDBClient(
-                host=host,
-                port=port,
-                username=user,
-                password=pwd,
-                database=db,
-        )
+        import influxdb.influxdb08 as influxdb
     else:
-        return influxdb.InfluxDBClient(
-                host=host,
-                port=port,
-                username=user,
-                password=pwd,
-                database=db,
-        )
+        import influxdb
+
+    return influxdb.InfluxDBClient(
+            host=host,
+            port=port,
+            username=user,
+            password=pwd,
+            database=db,
+    )
 
 
 def get_measurements(c, pattern=None):

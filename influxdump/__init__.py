@@ -49,6 +49,7 @@ def get_args():
         "measurements": args.measurements,
         "input": args.input,
         "action": args.action,
+        "legacy": args.legacy,
     }
 
 
