@@ -26,7 +26,7 @@ with open(path.join(here, 'requirements-dev.txt'), encoding='utf-8') as f:
 
 setup(
     name='influxdump',
-    version="1.0.1",
+    version="1.0.2",
     description='InfluxDB data backup tool',
     long_description=long_description,
     url='https://github.com/gams/influxdump',

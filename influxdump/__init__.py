@@ -9,7 +9,7 @@ from db import get_client
 
 __author__ = 'Stefan Berder <stefan@measureofquality.com>'
 __contact__ = 'code+influxdump@measureofquality.com'
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 
 def get_args():
