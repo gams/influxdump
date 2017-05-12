@@ -1,10 +1,27 @@
 # -*- coding: utf-8 -*-
 import json
+import os.path
 
 from db import get_queries, data_to_points
 
 
-def read_data(c, pattern=None):
+def query_data(c, queries):
+    """Generator querying the db and sending back data for each query as
+    elements.
+    """
+    data = []
+    for q in queries:
+        res = c.query(q.get_query())
+        records = []
+        for point in c.get_points(res):
+            records.append(point)
+        yield {
+            "meta": q.get_meta(),
+            "records": records
+        }
+
+
+def dump_data(c, pattern=None, folder=None):
     """Get data from the database, return an `influxdb.ResultSet`
 
     :param c: an influxdb client instance
@@ -14,26 +31,13 @@ def read_data(c, pattern=None):
     """
     measurements = c.get_measurements(pattern)
     queries = get_queries(measurements)
-    return query_data(c, queries)
-
-
-def query_data(c, queries):
-    data = []
-    for q in queries:
-        res = c.query(q.get_query())
-        records = []
-        for point in c.get_points(res):
-            records.append(point)
-        data.append({
-            "meta": q.get_meta(),
-            "records": records
-        })
-
-    return data
-
-
-def dump_data(data):
-    print(json.dumps(data))
+    for data in query_data(c, queries):
+        if folder is None:
+            print(json.dumps(data))
+        else:
+            dumpfile = os.path.join(folder, data["meta"]["measurement"] + ".json")
+            with open(dumpfile, "w") as fd:
+                json.dump(data, fd)
 
 
 def write_data(c, data):

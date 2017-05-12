@@ -3,7 +3,7 @@ import argparse
 import getpass
 import json
 
-from data import read_data, dump_data, write_data, load_data
+from data import dump_data, write_data, load_data
 from db import get_client
 
 
@@ -30,6 +30,8 @@ def get_args():
             help='influxdb legacy client (<=0.8)')
     parser.add_argument('-i', '--input', default=None,
             help="data/metadata input file, will force action to 'load'")
+    parser.add_argument('-F', '--folder', default=None,
+            help="destination folder for fragmented dump, if this flag is not used then dump on stdoout")
     parser.add_argument('action', metavar="action", nargs="?", default='dump',
             help="action, can be 'dump' or 'load', default to 'dump'",
             choices=["load", "dump"])
@@ -50,12 +52,12 @@ def get_args():
         "input": args.input,
         "action": args.action,
         "legacy": args.legacy,
+        "folder": args.folder,
     }
 
 
 def dump(args, client):
-    data = read_data(client, args["measurements"])
-    return dump_data(data)
+    dump_data(client, args["measurements"], args["folder"])
 
 
 def load(args, client):
@@ -63,7 +65,7 @@ def load(args, client):
     return write_data(client, data)
 
 
-if __name__ == "__main__":
+def main():
     args = get_args()
     client = get_client(
             host=args["host"],
@@ -78,3 +80,8 @@ if __name__ == "__main__":
         load(args, client)
     else:
         dump(args, client)
+
+
+
+if __name__ == "__main__":
+    main()
