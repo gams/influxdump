@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 import json
 import os.path
+import sys
 
 from db import get_queries, data_to_points
 
@@ -21,7 +23,7 @@ def query_data(c, queries):
         }
 
 
-def dump_data(c, pattern=None, folder=None):
+def dump_data(c, pattern=None, folder=None, dryrun=False, verbose=False):
     """Get data from the database, return an `influxdb.ResultSet`
 
     :param c: an influxdb client instance
@@ -30,14 +32,32 @@ def dump_data(c, pattern=None, folder=None):
     :type measurements: list
     """
     measurements = c.get_measurements(pattern)
+    if verbose is True or dryrun is True:
+        sys.stdout.write("> {} measurements matched\n".format(
+            len(measurements)))
     queries = get_queries(measurements)
-    for data in query_data(c, queries):
-        if folder is None:
-            print(json.dumps(data))
-        else:
-            dumpfile = os.path.join(folder, data["meta"]["measurement"] + ".json")
-            with open(dumpfile, "w") as fd:
-                json.dump(data, fd)
+
+    if dryrun is True:
+        sys.stdout.write("> following measurements would be dumped:\n".format(
+                len(measurements)))
+        for m in measurements:
+            sys.stdout.write("    {}\n".format(m))
+    else:
+        for data in query_data(c, queries):
+            if folder is None:
+                if verbose is True:
+                    sys.stdout.write("> dumping {}\n".format(
+                        data["meta"]["measurement"]))
+                print(json.dumps(data))
+            else:
+                filename = data["meta"]["measurement"] + ".json"
+                dumpfile = os.path.join(folder, filename)
+                if verbose is True:
+                    sys.stdout.write("> dumping {} to {} ({} records) [{}]\n".format(
+                        data["meta"]["measurement"], filename,
+                        len(data["records"]), datetime.now().isoformat()))
+                with open(dumpfile, "w") as fd:
+                    json.dump(data, fd)
 
 
 def write_data(c, data):

@@ -14,24 +14,26 @@ __version__ = "1.0.2"
 
 def get_args():
     parser = argparse.ArgumentParser(description='influxDB data backup tool')
+    parser.add_argument('-d', '--database', help='database', required=True,
+            type=str)
+    parser.add_argument('-F', '--folder', default=None,
+            help="destination folder for fragmented dump, if this flag is not used then dump on stdoout")
+    parser.add_argument('-H', '--host', help='server host',
+            default="localhost", type=str)
+    parser.add_argument('-i', '--input', default=None,
+            help="data/metadata input file, will force action to 'load'")
+    parser.add_argument('-L', '--legacy', action="store_true",
+            help='influxdb legacy client (<=0.8)')
+    parser.add_argument('-m', '--measurements', help='measurement pattern')
+    parser.add_argument('-n', '--dry-run', help='do mot really do anything', action="store_true")
+    parser.add_argument('-p', '--port', help='server port', default=8086,
+            type=int)
     parser.add_argument('-u', '--user', help='username', default='', type=str)
+    parser.add_argument('-v', '--verbose', help='make the script verbose', action="store_true")
     parser.add_argument('-w', '--password', help='password', default='',
             type=str)
     parser.add_argument('-W', '--pwdprompt', help='password prompt',
             action="store_true")
-    parser.add_argument('-d', '--database', help='database', required=True,
-            type=str)
-    parser.add_argument('-H', '--host', help='server host',
-            default="localhost", type=str)
-    parser.add_argument('-p', '--port', help='server port', default=8086,
-            type=int)
-    parser.add_argument('-m', '--measurements', help='measurement pattern')
-    parser.add_argument('-L', '--legacy', action="store_true",
-            help='influxdb legacy client (<=0.8)')
-    parser.add_argument('-i', '--input', default=None,
-            help="data/metadata input file, will force action to 'load'")
-    parser.add_argument('-F', '--folder', default=None,
-            help="destination folder for fragmented dump, if this flag is not used then dump on stdoout")
     parser.add_argument('action', metavar="action", nargs="?", default='dump',
             help="action, can be 'dump' or 'load', default to 'dump'",
             choices=["load", "dump"])
@@ -43,21 +45,24 @@ def get_args():
         pwd = args.password
 
     return {
-        "user": args.user,
-        "pwd": pwd,
         "db": args.database,
-        "host": args.host,
-        "port": args.port,
-        "measurements": args.measurements,
-        "input": args.input,
-        "action": args.action,
-        "legacy": args.legacy,
         "folder": args.folder,
+        "host": args.host,
+        "input": args.input,
+        "legacy": args.legacy,
+        "measurements": args.measurements,
+        "dryrun": args.dry_run,
+        "port": args.port,
+        "user": args.user,
+        "verbose": args.verbose,
+        "pwd": pwd,
+        "action": args.action,
     }
 
 
 def dump(args, client):
-    dump_data(client, args["measurements"], args["folder"])
+    dump_data(client, args["measurements"], args["folder"],
+              dryrun=args["dryrun"], verbose=args["verbose"])
 
 
 def load(args, client):
@@ -80,7 +85,6 @@ def main():
         load(args, client)
     else:
         dump(args, client)
-
 
 
 if __name__ == "__main__":
