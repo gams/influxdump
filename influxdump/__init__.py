@@ -2,8 +2,9 @@
 import argparse
 import getpass
 import json
+import sys
 
-from data import dump_data, write_data, load_data
+from data import dump_data, load_file, load_folder
 from db import get_client
 
 
@@ -11,13 +12,18 @@ __author__ = 'Stefan Berder <stefan@measureofquality.com>'
 __contact__ = 'code+influxdump@measureofquality.com'
 __version__ = "1.0.3"
 
+CHUNKSIZE = 50000
+
 
 def get_args():
     parser = argparse.ArgumentParser(description='influxDB data backup tool')
+    parser.add_argument('-c', '--chunksize',
+            help='query chunk size, default to {}'.format(CHUNKSIZE),
+            type=int, default=CHUNKSIZE)
     parser.add_argument('-d', '--database', help='database', required=True,
             type=str)
     parser.add_argument('-F', '--folder', default=None,
-            help="destination folder for fragmented dump, if this flag is not used then dump on stdoout")
+            help="destination folder for fragmented dump, if this flag is not used then dump on stdout")
     parser.add_argument('-H', '--host', help='server host',
             default="localhost", type=str)
     parser.add_argument('-i', '--input', default=None,
@@ -25,7 +31,7 @@ def get_args():
     parser.add_argument('-L', '--legacy', action="store_true",
             help='influxdb legacy client (<=0.8)')
     parser.add_argument('-m', '--measurements', help='measurement pattern')
-    parser.add_argument('-n', '--dry-run', help='do mot really do anything', action="store_true")
+    parser.add_argument('-n', '--dry-run', help='do not really do anything', action="store_true")
     parser.add_argument('-p', '--port', help='server port', default=8086,
             type=int)
     parser.add_argument('-u', '--user', help='username', default='', type=str)
@@ -35,8 +41,11 @@ def get_args():
     parser.add_argument('-W', '--pwdprompt', help='password prompt',
             action="store_true")
     parser.add_argument('action', metavar="action", nargs="?", default='dump',
-            help="action, can be 'dump' or 'load', default to 'dump'",
-            choices=["load", "dump"])
+            help="""
+            action, can be 'dump' or 'load', default to 'dump'. If action is
+            'load', one input file (--input) or a folder with data to load has
+            to be provided
+            """, choices=["load", "dump"])
     args = parser.parse_args()
 
     if args.pwdprompt is True:
@@ -44,7 +53,15 @@ def get_args():
     else:
         pwd = args.password
 
+    if args.action == "load" \
+            and args.input is None and args.folder is None:
+        sys.stderr.write("Action is load, missing input file or folder\n\n")
+        parser.print_help()
+        sys.exit(1)
+
+
     return {
+        "chunksize": args.chunksize,
         "db": args.database,
         "folder": args.folder,
         "host": args.host,
@@ -62,12 +79,15 @@ def get_args():
 
 def dump(args, client):
     dump_data(client, args["measurements"], args["folder"],
-              dryrun=args["dryrun"], verbose=args["verbose"])
+              dryrun=args["dryrun"], verbose=args["verbose"],
+              chunk_size=args["chunksize"])
 
 
 def load(args, client):
-    data = load_data(args["input"])
-    return write_data(client, data)
+    if args["input"] is not None:
+        load_file(client, args["input"], verbose=args["verbose"])
+    else:
+        load_folder(client, args["folder"], verbose=args["verbose"])
 
 
 def main():

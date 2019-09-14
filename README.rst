@@ -12,9 +12,25 @@ flexibility on how to load it back in the database.
 Usage
 =====
 
-Dump data::
+Dump all data from a database::
 
-    $ influxdump -u root -p -d database > data_dump.json
+    $ influxdump -u jdoe -W -d database > data_dump.json
+
+Dump data matching a pattern in chunk files of 50,000 records::
+
+    $ influxdump -u jdoe -W -d database -f _dump -c 50000 -m "node*"
+
+Load data from a dump folder::
+
+    $ influxdump -u jdoe -W -d database -f _dump
+
+
+Install
+=======
+
+.. code-block:: sh
+
+    $ pip install influxdump
 
 Packaging
 =========

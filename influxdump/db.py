@@ -45,6 +45,9 @@ class InfluxDBClient(object):
 
         return measurements
 
+    def write_points(self, *args, **kwargs):
+        return self._client.write_points(*args, **kwargs)
+
 
 class InfluxDB08Client(InfluxDBClient):
     def __init__(self, host, port, user, pwd, db):
