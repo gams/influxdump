@@ -30,8 +30,8 @@ def query_data(c, queries, chunk_size):
             })
 
 
-def dump_data(c, pattern=None, folder=None, dryrun=False, verbose=False,
-        chunk_size=50000):
+def dump_data(c, pattern=None, folder=None, dryrun=False, chunk_size=50000,
+        start='', end='', verbose=False):
     """Get data from the database, return an `influxdb.ResultSet`
 
     :param c: an influxdb client instance
@@ -41,7 +41,7 @@ def dump_data(c, pattern=None, folder=None, dryrun=False, verbose=False,
     if verbose is True or dryrun is True:
         sys.stdout.write("> {} measurements matched\n".format(
             len(measurements)))
-    queries = get_queries(measurements)
+    queries = get_queries(measurements, start=start, end=end)
 
     if dryrun is True:
         sys.stdout.write("> following measurements would be dumped:\n".format(

@@ -102,6 +102,14 @@ class Query(object):
         self.measurement = measurement
         if q is not None:
             self.q = q
+        if ctx['start'] != '' or ctx['end'] !='':
+            self.q += " WHERE "
+            if ctx['start'] != '':
+                self.q += "time >= '{start}'"
+            if ctx['start'] != '' and ctx['end'] != '':
+                self.q += " AND "
+            if ctx['end'] != '':
+                self.q += "time <= '{end}'"
         self.ctx = ctx
 
     def __repr__(self):
@@ -123,10 +131,10 @@ class Query(object):
         }
 
 
-def get_queries(measurements, ctx=None):
+def get_queries(measurements, ctx=None, start='', end=''):
     queries = []
     for m in measurements:
-        q = Query(m)
+        q = Query(m, ctx={'start': start, 'end': end})
         queries.append(q)
 
     return queries

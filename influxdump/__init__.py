@@ -22,8 +22,17 @@ def get_args():
             type=int, default=CHUNKSIZE)
     parser.add_argument('-d', '--database', help='database', required=True,
             type=str)
+    parser.add_argument('-e', '--end', default='', type=str,
+            help="""
+            Exclude all results after the specified timestamp (RFC3339 format).
+            If used without -start, all data will be backed up starting from
+            1970-01-01
+            """)
     parser.add_argument('-F', '--folder', default=None,
-            help="destination folder for fragmented dump, if this flag is not used then dump on stdout")
+            help="""
+            destination folder for fragmented dump, if this flag is not used
+            then dump on stdout
+            """)
     parser.add_argument('-H', '--host', help='server host',
             default="localhost", type=str)
     parser.add_argument('-i', '--input', default=None,
@@ -31,11 +40,18 @@ def get_args():
     parser.add_argument('-L', '--legacy', action="store_true",
             help='influxdb legacy client (<=0.8)')
     parser.add_argument('-m', '--measurements', help='measurement pattern')
-    parser.add_argument('-n', '--dry-run', help='do not really do anything', action="store_true")
+    parser.add_argument('-n', '--dry-run', help='do not really do anything',
+            action="store_true")
     parser.add_argument('-p', '--port', help='server port', default=8086,
             type=int)
+    parser.add_argument('-s', '--start', default='', type=str,
+            help="""
+            Include all points starting with the specified timestamp (RFC3339
+            format)
+            """)
     parser.add_argument('-u', '--user', help='username', default='', type=str)
-    parser.add_argument('-v', '--verbose', help='make the script verbose', action="store_true")
+    parser.add_argument('-v', '--verbose', help='make the script verbose',
+            action="store_true")
     parser.add_argument('-w', '--password', help='password', default='',
             type=str)
     parser.add_argument('-W', '--pwdprompt', help='password prompt',
@@ -53,6 +69,9 @@ def get_args():
     else:
         pwd = args.password
 
+    if args.end != "" and args.start == "":
+        args.start = "1970-01-01T00:00:00Z"
+
     if args.action == "load" \
             and args.input is None and args.folder is None:
         sys.stderr.write("Action is load, missing input file or folder\n\n")
@@ -63,6 +82,7 @@ def get_args():
     return {
         "chunksize": args.chunksize,
         "db": args.database,
+        "end": args.end,
         "folder": args.folder,
         "host": args.host,
         "input": args.input,
@@ -70,6 +90,7 @@ def get_args():
         "measurements": args.measurements,
         "dryrun": args.dry_run,
         "port": args.port,
+        "start": args.start,
         "user": args.user,
         "verbose": args.verbose,
         "pwd": pwd,
@@ -79,8 +100,9 @@ def get_args():
 
 def dump(args, client):
     dump_data(client, args["measurements"], args["folder"],
-              dryrun=args["dryrun"], verbose=args["verbose"],
-              chunk_size=args["chunksize"])
+              dryrun=args["dryrun"], chunk_size=args["chunksize"],
+              start=args["start"], end=args["end"],
+              verbose=args["verbose"])
 
 
 def load(args, client):
