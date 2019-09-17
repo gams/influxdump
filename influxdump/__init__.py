@@ -44,6 +44,10 @@ def get_args():
             action="store_true")
     parser.add_argument('-p', '--port', help='server port', default=8086,
             type=int)
+    parser.add_argument('-r', '--retry', default=0, type=int,
+            help="""
+            Retry a dump query in case of problem, 0 to disable, defaults to 0
+            """)
     parser.add_argument('-s', '--start', default='', type=str,
             help="""
             Include all points starting with the specified timestamp (RFC3339
@@ -90,6 +94,7 @@ def get_args():
         "measurements": args.measurements,
         "dryrun": args.dry_run,
         "port": args.port,
+        "retry": args.retry,
         "start": args.start,
         "user": args.user,
         "verbose": args.verbose,
@@ -101,7 +106,7 @@ def get_args():
 def dump(args, client):
     dump_data(client, args["measurements"], args["folder"],
               dryrun=args["dryrun"], chunk_size=args["chunksize"],
-              start=args["start"], end=args["end"],
+              start=args["start"], end=args["end"], retry=args["retry"],
               verbose=args["verbose"])
 
 

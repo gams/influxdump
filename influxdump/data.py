@@ -5,33 +5,45 @@ import os
 import os.path
 import sys
 
+from requests.exceptions import RequestException
+
 from db import get_queries, data_to_points
 
 
-def query_data(c, queries, chunk_size):
+def query_data(c, queries, chunk_size, retry=0):
     """Generator querying the db and sending back data for each query as
     elements.
     """
     data = []
+    _r = 0
     for q in queries:
-        res = c.query(q.get_query(),
-                chunked=True,
-                chunk_size=chunk_size)
-        counter = 0
-        for r in res:
-            records = []
-            counter += 1
-            for point in c.get_points(r):
-                records.append(point)
+        while True:
+            res = c.query(q.get_query(),
+                    chunked=True,
+                    chunk_size=chunk_size)
+            counter = 0
+            try:
+                for r in res:
+                    records = []
+                    counter += 1
+                    for point in c.get_points(r):
+                        records.append(point)
 
-            yield (counter, {
-                "meta": q.get_meta(),
-                "records": records
-            })
+                    yield (counter, {
+                        "meta": q.get_meta(),
+                        "records": records
+                    })
+                break
+            except RequestException:
+                if retry == 0:
+                    raise
+                _r += 1
+                if _r > retry:
+                    raise
 
 
 def dump_data(c, pattern=None, folder=None, dryrun=False, chunk_size=50000,
-        start='', end='', verbose=False):
+        start='', end='', retry=0, verbose=False):
     """Get data from the database, return an `influxdb.ResultSet`
 
     :param c: an influxdb client instance
@@ -49,7 +61,7 @@ def dump_data(c, pattern=None, folder=None, dryrun=False, chunk_size=50000,
         for m in measurements:
             sys.stdout.write("    {}\n".format(m))
     else:
-        for (counter, data) in query_data(c, queries, chunk_size):
+        for (counter, data) in query_data(c, queries, chunk_size, retry):
             if folder is None:
                 if verbose is True:
                     sys.stdout.write("> dumping {}\n".format(
