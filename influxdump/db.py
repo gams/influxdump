@@ -154,6 +154,9 @@ def cast_value(name, value, cast={}):
     if name in cast:
         type = getattr(__builtin__, cast[name])
         return type(value)
+    elif '*' in cast:
+        type = getattr(__builtin__, cast['*'])
+        return type(value)
     return value
 
 
