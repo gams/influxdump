@@ -2,9 +2,14 @@
 import re
 
 
-
 class InfluxDBClient(object):
-    def __init__(self, host, port, user, pwd, db):
+    def __init__(self,
+            host,
+            port,
+            user,
+            pwd,
+            db,
+    ):
         import influxdb
 
         self._client = influxdb.InfluxDBClient(
@@ -96,9 +101,10 @@ def get_client(host, port, user, pwd, db, legacy=False):
 class Query(object):
     measurement = None
     q = "SELECT * FROM \"{measurement}\""
-    ctx = None
+    m = "SHOW FIELD KEYS FROM \"{measurement}\""
+    ctx = {}
 
-    def __init__(self, measurement, q=None, ctx=None):
+    def __init__(self, measurement, q=None, ctx={}):
         self.measurement = measurement
         if q is not None:
             self.q = q
@@ -123,6 +129,10 @@ class Query(object):
             _ctx.update(self.ctx)
         return self.q.format(**_ctx)
 
+    def get_meta_query(self):
+        _ctx = {"measurement": self.measurement}
+        return self.m.format(**_ctx)
+
     def get_meta(self):
         return {
             "measurement": self.measurement,
@@ -131,7 +141,7 @@ class Query(object):
         }
 
 
-def get_queries(measurements, ctx=None, start='', end=''):
+def get_queries(measurements, start='', end=''):
     queries = []
     for m in measurements:
         q = Query(m, ctx={'start': start, 'end': end})
@@ -140,14 +150,21 @@ def get_queries(measurements, ctx=None, start='', end=''):
     return queries
 
 
-def data_to_points(measurement, records):
+def cast_value(name, value, cast={}):
+    if name in cast:
+        type = getattr(__builtin__, cast[name])
+        return type(value)
+    return value
+
+
+def data_to_points(measurement, records, typecast=False, cast={}):
     points = []
     for record in records:
         ts = record.pop("time")
         fields = {}
         for name, value in record.items():
             if value is not None:
-                fields[name] = float(value)
+                fields[name] = cast_value(name, value, cast)
         if fields:
             points.append({
                 "measurement": measurement,

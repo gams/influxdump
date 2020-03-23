@@ -6,6 +6,7 @@ import sys
 
 from data import dump_data, load_file, load_folder
 from db import get_client
+from exception import TypecastError
 
 
 __author__ = 'Stefan Berder <stefan@measureofquality.com>'
@@ -53,6 +54,18 @@ def get_args():
             Include all points starting with the specified timestamp (RFC3339
             format)
             """)
+    parser.add_argument('-t', '--typecast',
+            help="""
+            Enable casting field types based on file, meta or auto discovery
+            if possible. When used with 'dump', will add casting infor in meta.
+            When used with 'load', will try to find casting info. If casting is
+            enabled but no casting info can be found, the program will exit.
+            """, action="store_true")
+    parser.add_argument('--castfile',
+            help="""
+            File containing casting definitions, will supersede any other type
+            cast definition
+            """, type=str, default='')
     parser.add_argument('-u', '--user', help='username', default='', type=str)
     parser.add_argument('-v', '--verbose', help='make the script verbose',
             action="store_true")
@@ -75,6 +88,12 @@ def get_args():
 
     if args.end != "" and args.start == "":
         args.start = "1970-01-01T00:00:00Z"
+
+    if args.castfile != '':
+        with open(args.castfile, 'r') as fd:
+            cast = json.load(fd)
+    else:
+        cast = {}
 
     if args.action == "load" \
             and args.input is None and args.folder is None:
@@ -100,14 +119,25 @@ def get_args():
         "verbose": args.verbose,
         "pwd": pwd,
         "action": args.action,
+        "typecast": args.typecast,
+        "cast": cast,
     }
 
 
 def dump(args, client):
-    dump_data(client, args["measurements"], args["folder"],
-              dryrun=args["dryrun"], chunk_size=args["chunksize"],
-              start=args["start"], end=args["end"], retry=args["retry"],
-              verbose=args["verbose"])
+    dump_data(
+        client,
+        args["measurements"],
+        args["folder"],
+        dryrun=args["dryrun"],
+        chunk_size=args["chunksize"],
+        start=args["start"],
+        end=args["end"],
+        retry=args["retry"],
+        typecast=args["typecast"],
+        cast=args["cast"],
+        verbose=args["verbose"]
+    )
 
 
 def load(args, client):
@@ -135,4 +165,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except TypecastError as e:
+        sys.stderr.write("""Error trying to guess field types for casting,
+        influxdb < 1.0 did not provide key types when queried.
+        """)
+        sys.exit(1)
