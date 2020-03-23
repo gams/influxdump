@@ -142,9 +142,21 @@ def dump(args, client):
 
 def load(args, client):
     if args["input"] is not None:
-        load_file(client, args["input"], verbose=args["verbose"])
+        load_file(
+            client,
+            args["input"],
+            typecast=args["typecast"],
+            cast=args["cast"],
+            verbose=args["verbose"]
+        )
     else:
-        load_folder(client, args["folder"], verbose=args["verbose"])
+        load_folder(
+            client,
+            args["folder"],
+            typecast=args["typecast"],
+            cast=args["cast"],
+            verbose=args["verbose"]
+        )
 
 
 def main():

@@ -138,13 +138,15 @@ def dump_data(
                     json.dump(data, fd)
 
 
-def write_data(c, data):
+def write_data(c, data, typecast=False, cast={}):
     points = data_to_points(data["meta"]["measurement"],
-                            data["records"])
+                            data["records"],
+                            typecast,
+                            cast)
     c.write_points(points, batch_size=10000)
 
 
-def load_file(c, datafile, verbose=False):
+def load_file(c, datafile, typecast=False, cast={}, verbose=False):
     with open(datafile, 'r') as fh:
         data = json.load(fh)
 
@@ -154,13 +156,18 @@ def load_file(c, datafile, verbose=False):
                 datafile, data["meta"]["measurement"],
                 len(data["records"]), datetime.now().isoformat()))
 
-        write_data(c, data)
+        if typecast is True \
+                and cast == {} \
+                and "types" in data["meta"]:
+            cast = data["meta"]["types"]
+
+        write_data(c, data, typecast, cast)
 
 
-def load_folder(c, folder, verbose=False):
+def load_folder(c, folder, typecast=False, cast={}, verbose=False):
     for (dirpath, dirnames, filenames) in os.walk(folder):
         filenames.sort()
         for filename in filenames:
             if filename.endswith('.json'):
                 datafile = os.path.join(dirpath, filename)
-                load_file(c, datafile, verbose)
+                load_file(c, datafile, typecast, cast, verbose)
