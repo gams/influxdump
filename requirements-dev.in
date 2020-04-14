@@ -1,4 +1,4 @@
 -r requirements.in
 bumpr==0.3.7
-pip-tools==4.1.0
-twine==1.13.0
+pip-tools==4.5.1
+twine==3.1.1
