@@ -1,11 +1,9 @@
 [bumpr]
-file = influxdump/__init__.py
+file = influxdump/__about__.py
 vcs = git
 clean =
     python setup.py clean
     rm -rf *egg-info build dist
-files =
-    setup.py
 
 [bump]
 unsuffix = False

@@ -9,10 +9,6 @@ from db import get_client
 from exception import TypecastError
 
 
-__author__ = 'Stefan Berder <stefan@measureofquality.com>'
-__contact__ = 'code+influxdump@measureofquality.com'
-__version__ = "1.0.5"
-
 CHUNKSIZE = 50000
 
 

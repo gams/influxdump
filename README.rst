@@ -35,7 +35,7 @@ Load data from a dump folder::
 Install
 =======
 
-.. code-block:: sh
+.. code:: sh
 
     $ pip install influxdump
 
@@ -44,13 +44,13 @@ Packaging
 
 Create packages:
 
-.. code-block:: sh
+.. code:: sh
 
     $ python setup.py sdist bdist_wheel
 
 Push package:
 
-.. code-block:: sh
+.. code:: sh
 
     $ twine upload dist/*
     $ twine upload -r pypi dist/*
