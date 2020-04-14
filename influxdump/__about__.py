@@ -7,7 +7,7 @@ __name__ = "influxdump"
 __summary__ = 'InfluxDB data backup tool'
 __uri__ = "https://github.com/gams/influxdump"
 
-__version__ = "1.0.5"
+__version__ = "1.0.6"
 
 __author__ = 'Stefan Berder <stefan@measureofquality.com>'
 __contact__ = 'code+influxdump@measureofquality.com'
