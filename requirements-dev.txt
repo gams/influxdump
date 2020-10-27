@@ -4,18 +4,15 @@
 #
 #    pip-compile requirements-dev.in
 #
---index-url https://pypi.priv.measureofquality.com/gams/prod/+simple/
-
 bleach==3.1.0             # via readme-renderer
 bumpr==0.3.7              # via -r requirements-dev.in
 certifi==2019.9.11        # via requests
 cffi==1.14.0              # via cryptography
 chardet==3.0.4            # via requests
 click==7.1.1              # via pip-tools
-cryptography==2.8         # via secretstorage
+cryptography==3.2         # via secretstorage
 docutils==0.15.2          # via readme-renderer
 idna==2.8                 # via requests
-importlib-metadata==1.5.0  # via keyring, twine
 influxdb==5.3.0           # via -r requirements.in
 jeepney==0.4.3            # via keyring, secretstorage
 keyring==21.2.0           # via twine
@@ -35,7 +32,6 @@ tqdm==4.35.0              # via twine
 twine==3.1.1              # via -r requirements-dev.in
 urllib3==1.25.3           # via requests
 webencodings==0.5.1       # via bleach
-zipp==3.1.0               # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
