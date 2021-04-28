@@ -8,8 +8,16 @@ import sys
 import influxdb
 from requests.exceptions import RequestException
 
-from db import get_queries, data_to_points
-from exception import TypecastError
+from .db import get_queries, data_to_points
+from .exceptions import TypecastError
+
+
+FIELDTYPES = {
+    'integer': 'int',
+    'float': 'float',
+    'string': 'str',
+    'boolean': 'bool',
+}
 
 
 def query_data(
@@ -75,12 +83,7 @@ def get_meta(c, q, typecast=False, cast={}):
             for p in res.get_points():
                 if 'fieldType' not in p:
                     raise TypecastError("Field type cannot be guessed")
-                if p['fieldType'] == 'string':
-                    fieldtype = 'str'
-                else:
-                    fieldtype = p['fieldType']
-
-                _cast[p['fieldKey']] = fieldtype
+                _cast[p['fieldKey']] = FIELDTYPES[p['fieldType']]
             meta['types'] = _cast
 
     return meta

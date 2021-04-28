@@ -4,9 +4,9 @@ import getpass
 import json
 import sys
 
-from data import dump_data, load_file, load_folder
-from db import get_client
-from exception import TypecastError
+from .data import dump_data, load_file, load_folder
+from .db import get_client
+from .exceptions import TypecastError
 
 
 CHUNKSIZE = 50000
