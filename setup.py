@@ -48,7 +48,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            "influxdump=influxdump:main",
+            "influxdump=influxdump.bin.influxdump:main",
             "influxdump_recast=influxdump.bin.recast:main",
         ]
     },
