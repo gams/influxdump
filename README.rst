@@ -19,17 +19,17 @@ Dump all data from a database::
 Dump data from measurements containing the string 'node' in chunk files of
 50,000 records::
 
-    $ influxdump -u jdoe -W -d database -f _dump -c 50000 -m "node"
+    $ influxdump -u jdoe -W -d database -F _dump -c 50000 -m "node"
 
 Dump data from measurements starting with the string 'node' in chunk files of
 10,000 records (default) between 1st January 2019 and 31st March 2019 in French
 timezone::
 
-    $ influxdump -u jdoe -W -d database -f _dump -m "^node.*" --start "2019-01-01T00:00:00+01:00" --end "2019-03-31T23:59:59+01:00"
+    $ influxdump -u jdoe -W -d database -F _dump -m "^node.*" --start "2019-01-01T00:00:00+01:00" --end "2019-03-31T23:59:59+01:00"
 
 Load data from a dump folder::
 
-    $ influxdump -u jdoe -W -d database -f _dump
+    $ influxdump -u jdoe -W -d database -F _dump
 
 
 Install
