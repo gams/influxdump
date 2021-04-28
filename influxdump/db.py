@@ -18,6 +18,7 @@ class InfluxDBClient(object):
                 username=user,
                 password=pwd,
                 database=db,
+                headers={'Accept': 'application/json'},
         )
 
     def query(self, *args, **kwargs):
