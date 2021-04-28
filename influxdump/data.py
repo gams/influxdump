@@ -5,6 +5,7 @@ import os
 import os.path
 import sys
 
+import influxdb
 from requests.exceptions import RequestException
 
 from db import get_queries, data_to_points
@@ -31,16 +32,28 @@ def query_data(
             counter = 0
             try:
                 meta = get_meta(c, q, typecast, cast)
-                for r in res:
+                # sometimes answers are not chunked...
+                if type(res) == influxdb.resultset.ResultSet:
                     records = []
                     counter += 1
-                    for point in c.get_points(r):
+                    for point in c.get_points(res):
                         records.append(point)
 
                     yield (counter, {
                         "meta": meta,
                         "records": records
                     })
+                else:
+                    for r in res:
+                        records = []
+                        counter += 1
+                        for point in c.get_points(r):
+                            records.append(point)
+
+                        yield (counter, {
+                            "meta": meta,
+                            "records": records
+                        })
                 break
             except RequestException:
                 if retry == 0:
