@@ -50,6 +50,7 @@ setup(
         'console_scripts': [
             "influxdump=influxdump.bin.influxdump:main",
             "influxdump_recast=influxdump.bin.recast:main",
+            "influxdump_castcheck=influxdump.bin.castcheck:main",
         ]
     },
 )
