@@ -113,7 +113,8 @@ def main():
 
     for entry in os.scandir(args["folder"]):
         if entry.is_dir():
-            if pattern is not None and not pattern.search(entry.name):
+            if pattern is not None \
+                    and pattern.search(entry.name) is None:
                 continue
 
             for filename in os.scandir(entry.path):

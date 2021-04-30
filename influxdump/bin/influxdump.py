@@ -149,6 +149,7 @@ def load(args, client):
         load_folder(
             client,
             args["folder"],
+            pattern=args["measurements"],
             typecast=args["typecast"],
             cast=args["cast"],
             verbose=args["verbose"]

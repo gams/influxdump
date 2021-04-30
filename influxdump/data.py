@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 import os
 import os.path
+import re
 import sys
 
 import influxdb
@@ -180,10 +181,27 @@ def load_file(c, datafile, typecast=False, cast={}, verbose=False):
         write_data(c, data, typecast, cast)
 
 
-def load_folder(c, folder, typecast=False, cast={}, verbose=False):
-    for (dirpath, dirnames, filenames) in os.walk(folder):
-        filenames.sort()
-        for filename in filenames:
-            if filename.endswith('.json'):
-                datafile = os.path.join(dirpath, filename)
-                load_file(c, datafile, typecast, cast, verbose)
+def load_folder(
+        c,
+        folder,
+        pattern=None,
+        typecast=False,
+        cast={},
+        verbose=False
+    ):
+
+    if pattern:
+        _pattern = re.compile(pattern)
+    else:
+        _pattern = None
+
+    for entry  in os.scandir(folder):
+        if entry.is_dir():
+            if _pattern is not None \
+                    and _pattern.search(entry.name) is None:
+                continue
+
+            for filename in os.scandir(entry.path):
+                if not filename.name.endswith('.json'):
+                    continue
+                load_file(c, filename.path, typecast, cast, verbose)
