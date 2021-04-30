@@ -76,7 +76,7 @@ tqdm==4.35.0
     # via twine
 twine==3.4.1
     # via -r requirements-dev.in
-urllib3==1.25.3
+urllib3==1.25.8
     # via requests
 webencodings==0.5.1
     # via bleach
