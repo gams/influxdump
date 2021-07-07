@@ -21,6 +21,21 @@ FIELDTYPES = {
 }
 
 
+def has_data(client, query):
+    """Test if a query covers any data.
+    This test can be used to avoid running dump on a query that is empty, hence
+    speeding up the dump process.
+
+    Another oddity of influxdb: if no data points are found for the time range,
+    instead of returning a count of 0 for each field, the server will return
+    null...
+    """
+    res = client.query(query.get_count())
+    if len(res.items()) == 0:
+        return False
+    return True
+
+
 def query_data(
         c,
         queries,
@@ -34,6 +49,13 @@ def query_data(
     """
     _r = 0
     for q in queries:
+        if has_data(c, q) is False:
+            meta = get_meta(c, q, typecast, cast)
+            yield (None, {
+                "meta": meta,
+            })
+            continue
+
         while True:
             res = c.query(q.get_query(),
                     chunked=True,
@@ -128,6 +150,12 @@ def dump_data(
                 cast,
                 retry,
             ):
+            if counter is None:
+                if verbose is True:
+                    sys.stdout.write("> Skipping empty dataset {}\n".format(
+                        data["meta"]["measurement"]))
+                continue
+
             if folder is None:
                 if verbose is True:
                     sys.stdout.write("> dumping {}\n".format(

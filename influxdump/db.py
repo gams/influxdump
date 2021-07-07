@@ -130,6 +130,10 @@ class Query(object):
             _ctx.update(self.ctx)
         return self.q.format(**_ctx)
 
+    def get_count(self, ctx=None):
+        query = self.get_query(ctx)
+        return query.replace('*', 'COUNT(*)', 1)
+
     def get_meta_query(self):
         _ctx = {"measurement": self.measurement}
         return self.m.format(**_ctx)

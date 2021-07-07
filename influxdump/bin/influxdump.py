@@ -22,8 +22,6 @@ def get_args():
     parser.add_argument('-e', '--end', default='', type=str,
             help="""
             Exclude all results after the specified timestamp (RFC3339 format).
-            If used without -start, all data will be backed up starting from
-            1970-01-01
             """)
     parser.add_argument('-F', '--folder', default=None,
             help="""
@@ -48,7 +46,9 @@ def get_args():
     parser.add_argument('-s', '--start', default='', type=str,
             help="""
             Include all points starting with the specified timestamp (RFC3339
-            format)
+            format).
+            If used without --start, all data will be backed up starting from
+            1970-01-01T00:00:00Z
             """)
     parser.add_argument('-t', '--typecast',
             help="""
