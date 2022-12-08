@@ -8,7 +8,7 @@ bleach==3.1.0
     # via readme-renderer
 bumpr==0.3.7
     # via -r requirements-dev.in
-certifi==2019.9.11
+certifi==2022.12.7
     # via requests
 cffi==1.14.0
     # via cryptography
@@ -52,13 +52,13 @@ pytz==2016.10
     # via influxdb
 readme-renderer==24.0
     # via twine
-requests-toolbelt==0.9.1
-    # via twine
 requests==2.22.0
     # via
     #   influxdb
     #   requests-toolbelt
     #   twine
+requests-toolbelt==0.9.1
+    # via twine
 rfc3986==1.4.0
     # via twine
 secretstorage==3.1.2
